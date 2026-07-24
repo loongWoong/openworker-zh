@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useT } from "../i18n";
 import {
   addMcpServer,
   allowUser,
@@ -244,6 +245,7 @@ const MCP_PRESETS: { name: string; label: string; blurb: string; config: Record<
 ];
 
 export function McpTab() {
+  const t = useT();
   const [servers, setServers] = useState<McpServer[]>([]);
   const [adding, setAdding] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -391,7 +393,7 @@ function McpRow({
   return (
     <div className={CARD + " p-3.5"}>
       <div className="flex items-center gap-3">
-        <Toggle checked={server.enabled} onChange={onToggle} title="Enable this server" />
+        <Toggle checked={server.enabled} onChange={onToggle} title={t.personas.enablePersona} />
         <div className="flex-1 min-w-0">
           <div className="text-[14px] font-medium">{server.name}</div>
           <div className="text-[11.5px] text-faint">
@@ -829,7 +831,7 @@ export function ConnectSetup({
             // a visibly-parked button, and the manual path below stays fully live.
             <>
               <button className={BTN_ACCENT + " opacity-50"} disabled data-testid="managed-coming-soon">
-                {`Connect ${c.title} with one click`}
+                {`${t.common.connect} ${c.title} with one click`}
                 <span className="ml-2 text-[11px] font-medium px-1.5 py-0.5 rounded-full bg-white/25">
                   Coming soon
                 </span>
@@ -840,7 +842,7 @@ export function ConnectSetup({
             </>
           ) : cloud?.signed_in ? (
             <button className={BTN_ACCENT} onClick={oneClick} disabled={waiting}>
-              {waiting ? "Check your browser…" : `Connect ${c.title} with one click`}
+              {waiting ? t.onboarding.checkYourBrowser : `${t.common.connect} ${c.title} with one click`}
             </button>
           ) : cloud ? (
             <CloudSignInInline
@@ -881,7 +883,7 @@ export function ConnectSetup({
       ))}
       <div>
         <button className={BTN_ACCENT} onClick={submit} disabled={busy}>
-          {busy ? "Validating…" : "Connect"}
+          {busy ? t.settings.testing : t.common.connect}
         </button>
       </div>
       {error && <div className="text-[12.5px] text-danger">{error}</div>}

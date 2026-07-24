@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { chooseFolder } from "../tauri";
 import { Icon } from "./Icon";
+import { useT } from "../i18n";
 
 // A single "Give access to a folder" affordance. Collapsed it's one button; expanded it's a path
 // field (Browse on desktop, paste anywhere) + an "Allow writing" checkbox that's OFF by default —
@@ -22,6 +23,7 @@ export function AddFolderForm({
 }) {
   const [open, setOpen] = useState(!!startOpen);
   const [path, setPath] = useState("");
+  const t = useT();
   const [writable, setWritable] = useState(false);
 
   const reset = () => {
@@ -56,7 +58,7 @@ export function AddFolderForm({
         <input
           className="addfolder-path"
           autoFocus
-          placeholder="Choose or paste a folder path…"
+          placeholder={t.session.pathPlaceholder}
           value={path}
           spellCheck={false}
           onChange={(e) => setPath(e.target.value)}

@@ -14,6 +14,7 @@ import { BrandIcon } from "./brandIcons";
 import { Icon } from "./Icon";
 import { Markdown } from "./Markdown";
 import { PersonaHero } from "./PersonaHero";
+import { useT } from "../i18n";
 
 // The Persona Gallery, as a screen-sized modal over Settings ▸ Personas (the catalog
 // wants room the inline section never had; installs finish back on the Personas page,
@@ -52,6 +53,7 @@ export function GalleryModal({
   onClose: () => void;
   onInstalled?: () => void;
 }) {
+  const t = useT();
   const [cloud, setCloud] = useState<CloudStatus | null>(null);
   const [cards, setCards] = useState<GalleryPersona[]>([]);
   const [installed, setInstalled] = useState<Set<string>>(new Set());
@@ -143,7 +145,7 @@ export function GalleryModal({
       <div className="flex items-center gap-2 mb-4">
         {(
           [
-            ["all", "All"],
+            ["all", t.common.all],
             ["openworker", "From OpenWorker"],
             ["team", "From your team"],
           ] as [Source, string][]
@@ -288,7 +290,7 @@ export function GalleryModal({
                 <span className="text-[12.5px] text-muted">Installed</span>
               ) : (
                 <button className={BTN_ACCENT} onClick={() => install(detailSlug)} disabled={busy}>
-                  {busy ? "Installing…" : "Install"}
+                  {busy ? t.common.loading : t.common.confirm}
                 </button>
               )}
             </div>
@@ -381,14 +383,14 @@ export function GalleryModal({
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search personas"
+              placeholder={t.personas.title + " " + t.common.search}
               className="w-[180px] px-3 py-1.5 rounded-lg border border-line bg-paper text-[12.5px] text-ink outline-none focus:border-accent"
             />
           )}
           <button
             className="text-faint hover:text-ink shrink-0"
             onClick={onClose}
-            aria-label="Close gallery"
+            aria-label={t.common.close + " gallery"}
             data-testid="gallery-close"
           >
             <Icon name="x" size={16} />
@@ -417,7 +419,7 @@ export function GalleryModal({
                 </div>
               </div>
               <button className={BTN_ACCENT} onClick={signIn} disabled={signingIn}>
-                {signingIn ? "Check your browser…" : "Sign in"}
+                {signingIn ? t.onboarding.checkYourBrowser : t.common.signIn}
               </button>
             </div>
           ) : detailSlug ? (

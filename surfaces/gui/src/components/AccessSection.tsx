@@ -36,6 +36,7 @@ import { ConnectSetup } from "./ManageTabs";
 import { RootRow } from "./RootRow";
 import { ChannelPicker } from "./SubscriptionsChip";
 import { Toggle } from "./Toggle";
+import { useT } from "../i18n";
 
 // A channel address's platform: "slack:C0123" → "slack"; a bare id or "#mention" defaults to
 // slack (the backend's own default when no platform prefix is given).
@@ -69,6 +70,7 @@ export function AccessSection({
   openKey?: number;
   onOpenIntegrations?: () => void;
 }) {
+  const t = useT();
   const [open, setOpen] = useState(false);
   const [conns, setConns] = useState<SessionConnections | null>(null);
   const [byName, setByName] = useState<ConnectorMap>({});
@@ -173,7 +175,7 @@ export function AccessSection({
     const channel = raw.includes(":") || raw.startsWith("#") ? raw : `${channelsFor}:${raw}`;
     const r = await subscribeChannel(sessionId, channel);
     if (!r.ok) {
-      setAddErr(r.error || "Couldn't add that channel.");
+      setAddErr(r.error || (t.common.error + ": " + "channel"));
       return;
     }
     setAddErr(null);
@@ -330,7 +332,7 @@ export function AccessSection({
                   <div className="mt-1.5">
                     <input
                       className="w-full px-2.5 py-1.5 rounded-lg border border-line bg-panel text-[12.5px] outline-none focus:border-accent"
-                      placeholder="Search connectors…"
+                      placeholder={t.connectors.search + "…"}
                       value={query}
                       onChange={(e) => setQuery(e.target.value)}
                       onKeyDown={(e) => {

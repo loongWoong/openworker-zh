@@ -12,6 +12,7 @@ import { ConnectorBadge } from "../../connectors/ConnectorIcon";
 import { AllowlistBlock, ConnectorTools, ListeningSessionsBlock, UnauthorizedBlock } from "../ManageTabs";
 import { AccountsDetail } from "./AccountsDetail";
 import { AvailableDetail } from "./AvailableDetail";
+import { useT } from "../../i18n";
 import { CalendarDetail } from "./CalendarDetail";
 import { ConnectorsList } from "./ConnectorsList";
 import { GithubDetail } from "./GithubDetail";
@@ -70,6 +71,7 @@ export function ConnectorsSection() {
 
   if (detail) {
     const c = connectors.find((x) => x.name === detail);
+    const t = useT();
     const Page = DETAIL_PAGES[detail];
     return (
       <div>
@@ -130,7 +132,7 @@ function GenericDetail({
           <h2 className="text-[20px] font-semibold tracking-tight leading-tight">{c.title}</h2>
           <div className="text-[12.5px] text-muted flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-ok" />
-            {c.account || (c.auth === "none" ? "Built in" : "Connected")}
+            {c.account || (c.auth === "none" ? t.common.on : t.connectors.connected)}
           </div>
         </div>
         {c.auth !== "none" && (

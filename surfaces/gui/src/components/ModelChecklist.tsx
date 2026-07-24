@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { addModel, getSettings, removeModel, setDefaultModel } from "../api";
+import { useT } from "../i18n";
 
 // One provider's models as a checklist: tick = shown in the composer's model picker (the
 // curated list), the black "default" badge marks the model new sessions use, and hovering any
@@ -22,6 +23,7 @@ export function ModelChecklist({
   labels?: Record<string, string>; // curated display names (full id → label); raw id when absent
   onChanged: (next: { models: string[]; model: string }) => void;
 }) {
+  const t = useT();
   const [draft, setDraft] = useState("");
 
   const provOf = (id: string) => {
@@ -91,7 +93,7 @@ export function ModelChecklist({
       })}
       <div className="mlist-add">
         <input
-          placeholder="Add another model…"
+          placeholder={t.common.new_ + " model…"}
           value={draft}
           spellCheck={false}
           autoComplete="off"

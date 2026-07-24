@@ -8,6 +8,7 @@ import {
   type RecentChannel,
 } from "../api";
 import { Icon } from "./Icon";
+import { useT } from "../i18n";
 
 // A workspace roster hit for the typeahead: type a channel NAME, we resolve the
 // id (conversations.list, cached on the desktop) and compose the address.
@@ -257,6 +258,7 @@ export function SubscriptionsChip({
   channels: string[];
   onChanged: () => void;
 }) {
+  const t = useT();
   const [open, setOpen] = useState(false);
   const [recent, setRecent] = useState<RecentChannel[]>([]);
   const [draft, setDraft] = useState("");
@@ -288,7 +290,7 @@ export function SubscriptionsChip({
     <div className="sub-chip-wrap" ref={ref}>
       <button
         className={"wschip sub-chip" + (open ? " active" : "")}
-        title="Channels this session listens to"
+        title={t.connectors.title + " listening"}
         onClick={() => setOpen((v) => !v)}
       >
         <Icon name="plug" size={12} /> {channels.length || "+"}

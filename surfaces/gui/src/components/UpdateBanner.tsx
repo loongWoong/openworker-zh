@@ -7,6 +7,7 @@ import {
   isTauri,
   type UpdateInfo,
 } from "../tauri";
+import { useT } from "../i18n";
 
 // Auto-update prompt (desktop shell only — the browser build never renders this).
 // Deliberately a PROMPT, not a silent background install: swapping the app under a
@@ -31,6 +32,7 @@ const RECHECK_MS = 30 * 60_000;
 type Phase = "downloading" | "ready" | "fallback" | "installing" | "error";
 
 export function UpdateBanner() {
+  const t = useT();
   const [update, setUpdate] = useState<UpdateInfo | null>(null);
   const [phase, setPhase] = useState<Phase>("downloading");
   // Per-run, per-version dismissal — no localStorage, so a restart re-offers, and a
@@ -104,7 +106,7 @@ export function UpdateBanner() {
           disabled={busy}
           data-testid="update-install"
         >
-          {busy ? "Downloading…" : "Restart to update"}
+          {busy ? t.update.downloading : t.update.restart}
         </button>
         <button
           className="px-2 py-1.5 text-[12.5px] text-faint hover:text-muted"
