@@ -2,6 +2,7 @@ import { useState, type ReactNode } from "react";
 import type { InboxItem } from "../api";
 import { humanizeApprovalTitle } from "../humanize";
 import { PreviewBlock, scopeNote, TitleText } from "./ApprovalCard";
+import { useT } from "../i18n";
 
 // One Inbox item, rendered identically in the Inbox list and inline in its own session view
 // (answer-in-context). Resolving either place hits the same item id — first responder wins.
@@ -36,6 +37,7 @@ export function InboxItemCard({
   chip?: ReactNode; // optional "go to session" affordance (shown in the Inbox list, not inline)
   compact?: boolean;
 }) {
+  const t = useT();
   const [answer, setAnswer] = useState("");
   const [selected, setSelected] = useState<string[]>([]);
   const options = item.options || [];
@@ -54,7 +56,7 @@ export function InboxItemCard({
         }}
       />
       <button className={BTN_PRIMARY} disabled={!answer.trim()} onClick={() => onResolve(item.id, answer)}>
-        Send
+        {t.common.send}
       </button>
     </div>
   );

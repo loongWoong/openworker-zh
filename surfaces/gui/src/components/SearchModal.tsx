@@ -3,6 +3,7 @@ import type { Persona } from "../api";
 import type { SessionInfo } from "../types";
 import { isProjectScoped, shortPersonaName } from "../personaScope";
 import { Icon } from "./Icon";
+import { useT } from "../i18n";
 import { baseName } from "../paths";
 
 // Command-palette search (Codex-style): clicking Search opens this overlay over the whole app
@@ -23,6 +24,7 @@ export function SearchModal({
   onSelect: (id: string, workspace: string, agent: string) => void;
   onClose: () => void;
 }) {
+  const t = useT();
   const [query, setQuery] = useState("");
   const [active, setActive] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -119,7 +121,7 @@ export function SearchModal({
             ref={inputRef}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search chats"
+            placeholder={t.common.search + " " + "chats"}
             className="flex-1 bg-transparent outline-none text-[15px] text-ink placeholder:text-faint"
           />
           <kbd className="text-[10.5px] text-faint bg-paper border border-line rounded px-1.5 py-0.5 font-sans">

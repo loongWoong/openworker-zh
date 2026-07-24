@@ -17,6 +17,7 @@ import { AddConnectionModal } from "./AddConnectionModal";
 import type { DetailProps } from "./ConnectorsSection";
 import { ToolsDisclosure } from "./ToolsDisclosure";
 import { FOOT, GRP, GRP_H, PILL_ACCENT, PILL_LINE, ROW, TAG_WARN, XBTN } from "./ui";
+import { useT } from "../../i18n";
 
 // The GitHub detail page (github-relay-spec §8), the Slack page's shape: one
 // group per App INSTALLATION (the allow-list scope) — People (sender logins
@@ -29,17 +30,18 @@ const LABEL = "text-[12.5px] text-muted w-24 shrink-0";
 
 /** The relay status line, one honest layer at a time (the Slack rule). */
 function relayHealth(gh: GithubStatus | null): { dot: string; text: string } {
-  if (!gh) return { dot: "bg-ok", text: "Live · managed relay" };
+  if (!gh) return { dot: "bg-ok", text: t.connectors.githubRelayLive };
   if (!gh.signed_in)
-    return { dot: "bg-warnInk", text: "Sign-in needed — relaying is paused" };
+    return { dot: "bg-warnInk", text: t.connectors.githubSignInNeeded };
   if (gh.relay.state === "offline")
-    return { dot: "bg-faint/60", text: "Offline — can't reach the relay" };
+    return { dot: "bg-faint/60", text: t.connectors.githubRelayOffline };
   if (gh.relay.state === "reconnecting")
-    return { dot: "bg-warnInk", text: "Reconnecting to the relay…" };
-  return { dot: "bg-ok", text: "Live · managed relay" };
+    return { dot: "bg-warnInk", text: t.connectors.githubRelayReconnecting };
+  return { dot: "bg-ok", text: t.connectors.githubRelayLive };
 }
 
 export function GithubDetail({ c, cloud, onChanged }: DetailProps) {
+  const t = useT();
   const [adding, setAdding] = useState(false);
   const [subs, setSubs] = useState<Subscription[]>([]);
   const [status, setStatus] = useState<GithubStatus | null>(null);
@@ -147,7 +149,7 @@ export function GithubDetail({ c, cloud, onChanged }: DetailProps) {
         <AddConnectionModal
           c={c}
           cloud={cloud}
-          title="Add an installation"
+          title={t.connectors.githubAddInstallation}
           onClose={() => setAdding(false)}
           onChanged={changed}
         />
@@ -231,7 +233,7 @@ function DisconnectBtn({ id, busy, onClick }: { id: string; busy: boolean; onCli
       onClick={onClick}
       disabled={busy}
     >
-      {busy ? "Disconnecting…" : "Disconnect installation"}
+      {busy ? t.common.close + "…" : t.connectors.githubDisconnect + " installation"}
     </button>
   );
 }

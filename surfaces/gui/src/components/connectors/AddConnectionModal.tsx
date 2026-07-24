@@ -8,6 +8,7 @@ import {
   type Connector,
 } from "../../api";
 import { ConnectorBadge } from "../../connectors/ConnectorIcon";
+import { useT } from "../../i18n";
 import { ConnectSetup } from "../ManageTabs";
 import { CloudSignInInline, CloudStatusPending } from "./CloudSignIn";
 import { PILL_ACCENT, PILL_LINE, TAG_ACCENT } from "./ui";
@@ -44,6 +45,7 @@ export function AddConnectionModal({
     c.name === "notion" ||
     c.name === "attio" ||
     (mcpBacked && c.fields.length > 0);
+  const t = useT();
   const [pane, setPane] = useState<"one" | "manual">("one");
 
   useEffect(() => {
@@ -84,7 +86,7 @@ export function AddConnectionModal({
                     }
                     onClick={() => setPane(p)}
                   >
-                    {p === "one" ? "One click" : "Manual"}
+                    {p === "one" ? t.connectors.oneClick : t.connectors.manual}
                   </button>
                 ))}
               </div>

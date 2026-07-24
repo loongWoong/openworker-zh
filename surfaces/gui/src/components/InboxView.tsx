@@ -12,6 +12,7 @@ import {
   type RecentChannel,
 } from "../api";
 import { Icon } from "./Icon";
+import { useT } from "../i18n";
 import { InboxItemCard } from "./InboxItemCard";
 import { InboxConfigure } from "./InboxConfigure";
 import { PanelHead } from "./IntegrationsView";
@@ -23,10 +24,10 @@ const ICON_FOR: Record<string, "diamond" | "chat" | "code"> = {
   code: "code",
 };
 
-const KIND_TABS: { key: string; label: string }[] = [
-  { key: "all", label: "All" },
-  { key: "approval", label: "Approvals" },
-  { key: "question", label: "Questions" },
+const KIND_TABS: { key: string; labelKey: string }[] = [
+  { key: "all", labelKey: "All" },
+  { key: "approval", labelKey: "Approvals" },
+  { key: "question", labelKey: "Questions" },
 ];
 
 const CHIP = (active: boolean) =>
@@ -145,7 +146,7 @@ export function InboxView({
       <div className="flex-1 min-w-0 overflow-y-auto hairline-scroll">
         <div className="max-w-4xl mx-auto px-7 py-6">
           <PanelHead
-            title="Inbox"
+            title={t.inbox.title}
             sub="Approvals, questions, and notifications from your coworkers — including sessions running unattended."
           />
 

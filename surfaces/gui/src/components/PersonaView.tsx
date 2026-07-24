@@ -19,6 +19,7 @@ import {
 import { ConnectorBadge } from "../connectors/ConnectorIcon";
 import { fullPersonaName, shortPersonaName } from "../personaScope";
 import { Icon } from "./Icon";
+import { useT } from "../i18n";
 import { PersonaGlyph } from "./personaIcon";
 import { Toggle } from "./Toggle";
 import { indexConnectors, labelFor, visualFor, type ConnectorMap } from "../connectors/visuals";
@@ -42,6 +43,7 @@ export function PersonaView({
   onOpenIntegrations?: () => void;
 }) {
   const [detail, setDetail] = useState<PersonaDetail | null>(null);
+  const t = useT();
   const [byName, setByName] = useState<ConnectorMap>({});
   const [error, setError] = useState<string | null>(null);
 
@@ -119,7 +121,7 @@ export function PersonaView({
             </div>
             <div className="ml-auto flex items-center gap-2">
               <span className="text-[12px] text-muted">{detail.enabled ? "Enabled" : "Disabled"}</span>
-              <Toggle checked={detail.enabled} onChange={toggleEnabled} title="Enable this persona" />
+              <Toggle checked={detail.enabled} onChange={toggleEnabled} title={t.personas.enablePersona} />
             </div>
           </header>
 

@@ -242,7 +242,7 @@ function SubscriptionsCard() {
                 <td className="px-4 py-2.5 text-right">
                   <button
                     className="text-faint hover:text-danger"
-                    title="Unsubscribe"
+                    title={t.common.collapse}
                     onClick={() => remove(s.session_id, s.channel)}
                   >
                     ×

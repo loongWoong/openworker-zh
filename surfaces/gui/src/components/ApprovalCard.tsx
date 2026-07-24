@@ -2,6 +2,8 @@ import { useState } from "react";
 import type { ApprovalDecision, Item } from "../types";
 import { humanizeApprovalTitle, type HumanLine } from "../humanize";
 import { Icon } from "./Icon";
+import { useT } from "../i18n";
+import type { Translations } from "../i18n";
 
 export function shortArgs(args: any): string {
   if (!args || typeof args !== "object") return "";
@@ -14,16 +16,21 @@ export function shortArgs(args: any): string {
     .join("  ");
 }
 
-// Human verbs kept for the §25 grant lines (the card title now comes from humanize.ts).
-const TOOL_VERBS: Record<string, string> = {
-  write_file: "Write a file",
-  replace_in_file: "Edit a file",
-  apply_patch: "Apply a patch",
-  apply_unified_diff: "Apply a patch",
-  run_shell: "Run a command",
-  send_message: "Send a message",
-  send_file: "Send a file",
+// Tool name → i18n key mapping (used at render time)
+const TOOL_VERB_KEYS: Record<string, keyof Translations["transcript"]> = {
+  write_file: "writeFile",
+  replace_in_file: "editFile",
+  apply_patch: "applyPatch",
+  apply_unified_diff: "applyPatch",
+  run_shell: "runShell",
+  send_message: "sendMessage",
+  send_file: "sendFile",
 };
+
+function toolVerb(name: string, t: Translations["transcript"]): string {
+  const key = TOOL_VERB_KEYS[name];
+  return key ? t[key] : name;
+}
 
 // §35: routine workspace writes render as a compact ROW; everything else is a full card.
 const FILE_WRITES = new Set(["write_file", "replace_in_file", "apply_patch", "apply_unified_diff"]);
@@ -131,6 +138,7 @@ function Buttons({
   runTask?: { id: string; title: string } | null;
   primaryLabel: string;
 }) {
+  const t = useT();
   const connector = item.category === "connector";
   const offerStanding = !!(runTask && item.standingTarget);
   return (
@@ -155,7 +163,7 @@ function Buttons({
       {!connector && !offerStanding && item.name !== "run_shell" && (
         <button
           className="btn"
-          title={`Always allow ${TOOL_VERBS[item.name]?.toLowerCase() || item.name} for this session`}
+          title={`Always allow ${toolVerb(item.name, t.transcript).toLowerCase() || item.name} for this session`}
           onClick={() => onApprove("always_tool")}
         >
           Always allow
@@ -187,6 +195,7 @@ export function ApprovalCard({
   runTask?: { id: string; title: string } | null;
   compact?: boolean;
 }) {
+  const t = useT();
   const [peek, setPeek] = useState(false);
   const title = humanizeApprovalTitle(item.name, item.args);
   const scope = scopeNote(item.name, item.args, item.category);
@@ -261,7 +270,7 @@ export function ApprovalCard({
                 {g.access === "write" ? "✓" : "·"}
               </span>
               <span className="grant-line">
-                {TOOL_VERBS[g.tool] || g.tool} <code className="approval-tool">{g.target}</code>
+                {toolVerb(g.tool, t.transcript) || g.tool} <code className="approval-tool">{g.target}</code>
                 <span className="grant-note">
                   {g.access === "write" ? " — always allowed once you approve" : " — read-only"}
                 </span>

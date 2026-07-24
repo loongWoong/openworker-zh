@@ -10,6 +10,7 @@ import {
 } from "../api";
 import type { SessionInfo } from "../types";
 import { Icon } from "./Icon";
+import { useT } from "../i18n";
 
 // Personas management: enable a persona, choose whether it shows in the new-session picker,
 // set the default, and install more from a local directory or a GitHub repo (snapshotted).
@@ -26,6 +27,7 @@ const BTN_BORDERED =
   "text-[12.5px] px-2.5 py-1.5 rounded-lg border border-line bg-paper hover:border-lineStrong shrink-0 disabled:opacity-40 disabled:hover:border-line";
 
 export function PersonasTab({ onOpenPersona }: { onOpenPersona?: (id: string) => void }) {
+  const t = useT();
   const [personas, setPersonas] = useState<Persona[]>([]);
   const [mode, setMode] = useState<"git" | "dir">("git");
   const [src, setSrc] = useState("");
@@ -167,7 +169,7 @@ export function PersonasTab({ onOpenPersona }: { onOpenPersona?: (id: string) =>
               ) : (
                 <button
                   className="text-faint hover:text-danger shrink-0 p-1"
-                  title="Delete this persona"
+                  title={t.personas.deletePersona}
                   aria-label={`Delete ${p.name}`}
                   data-testid={`persona-delete-${p.id}`}
                   onClick={() => setConfirmDel(p.id)}
@@ -213,8 +215,8 @@ export function PersonasTab({ onOpenPersona }: { onOpenPersona?: (id: string) =>
       </p>
       <div className="flex items-center gap-2">
         <select className={SELECT} value={mode} onChange={(e) => setMode(e.target.value as "git" | "dir")}>
-          <option value="git">GitHub URL</option>
-          <option value="dir">Local directory</option>
+          <option value="git">{t.personas.installFromGit}</option>
+          <option value="dir">{t.personas.installFromFolder}</option>
         </select>
         <input
           className={INPUT}

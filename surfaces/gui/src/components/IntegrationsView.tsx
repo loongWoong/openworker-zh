@@ -3,6 +3,7 @@ import { getConnectors } from "../api";
 import { McpTab } from "./ManageTabs";
 import { ConnectorsSection } from "./connectors/ConnectorsSection";
 import { Icon } from "./Icon";
+import { useT } from "../i18n";
 
 // The Connectors surface (renamed from "Integrations", §26) keeps the left sub-nav, now just
 // Connectors · MCP. The old "Messaging routing" tab (and its ⚠ unrouted badge) moved whole to
@@ -19,6 +20,7 @@ const INT_TABS: { key: IntTab; label: string; icon: "plug" | "code" }[] = [
 ];
 
 export function IntegrationsView() {
+  const t = useT();
   const [tab, setTab] = useState<IntTab>("connectors");
   // Sub-nav count: how many connectors exist. Polled so the badge stays live.
   const [connCount, setConnCount] = useState<number | null>(null);
@@ -36,7 +38,7 @@ export function IntegrationsView() {
     <main className="flex-1 min-w-0 flex bg-paper">
       <nav className="page-subnav w-[208px] shrink-0 border-r border-line bg-panel/40 px-3 py-4">
         <div className="px-2 text-[13.5px] font-semibold mb-3 flex items-center gap-2">
-          <Icon name="plug" size={16} /> Connectors
+          <Icon name="plug" size={16} /> {t.connectors.title}
         </div>
         {INT_TABS.map((t) => {
           const active = tab === t.key;
@@ -69,16 +71,16 @@ export function IntegrationsView() {
           {tab === "connectors" ? (
             <section>
               <PanelHead
-                title="Connectors"
-                sub="Apps and tools your coworkers can use. Connected ones come first."
+                title={t.connectors.title}
+                sub={t.connectors.subtitle}
               />
               <ConnectorsSection />
             </section>
           ) : (
             <section>
               <PanelHead
-                title="MCP servers"
-                sub="External tool servers (stdio or HTTP), shared across all agents."
+                title={t.connectors.mcpServers}
+                sub={t.connectors.mcpServersSub}
               />
               <McpTab />
             </section>

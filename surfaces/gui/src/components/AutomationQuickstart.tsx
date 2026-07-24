@@ -13,6 +13,7 @@ import {
 import { ConnectorBadge } from "../connectors/ConnectorIcon";
 import { ChannelPicker } from "./SubscriptionsChip";
 import { SelectMenu } from "./SelectMenu";
+import { useT } from "../i18n";
 
 // The Automations quickstart (UX-DECISIONS §29): ONE template system. The former onboarding
 // recipe step (§24's role recipes) merged into the page's "Start from a template" grid — every
@@ -22,16 +23,17 @@ import { SelectMenu } from "./SelectMenu";
 // The `ob-*` testids moved here with the machinery.
 
 // "When" = day choice × free time (owner call 2026-07-11); the cron assembles from the two.
-const DAYS: Record<string, { label: string; dow: string }> = {
-  mon: { label: "Mondays", dow: "1" },
-  tue: { label: "Tuesdays", dow: "2" },
-  wed: { label: "Wednesdays", dow: "3" },
-  thu: { label: "Thursdays", dow: "4" },
-  fri: { label: "Fridays", dow: "5" },
-  sat: { label: "Saturdays", dow: "6" },
-  sun: { label: "Sundays", dow: "0" },
-  weekdays: { label: "Weekdays", dow: "1-5" },
-  daily: { label: "Every day", dow: "*" },
+// Day labels are now resolved via i18n at render time (see resolvedDays in component).
+const DAYS: Record<string, { labelKey: string; dow: string }> = {
+  mon: { labelKey: "mondays", dow: "1" },
+  tue: { labelKey: "tuesdays", dow: "2" },
+  wed: { labelKey: "wednesdays", dow: "3" },
+  thu: { labelKey: "thursdays", dow: "4" },
+  fri: { labelKey: "fridays", dow: "5" },
+  sat: { labelKey: "saturdays", dow: "6" },
+  sun: { labelKey: "sundays", dow: "0" },
+  weekdays: { labelKey: "weekdays", dow: "1-5" },
+  daily: { labelKey: "everyDay", dow: "*" },
 };
 // §30 connect-state spinner (the app has no other spinner — waits elsewhere are label swaps).
 // Exported for Onboarding page 2's sign-in button (same states, same look).
@@ -160,6 +162,7 @@ export function AutomationQuickstart({
     permissions?: { tool: string; target: string; access: "read" | "write" }[];
   }) => void;
 }) {
+  const t = useT();
   const [pickedKey, setPickedKey] = useState<string | null>(null);
   const picked = TEMPLATES.find((t) => t.key === pickedKey) || null;
 
@@ -505,7 +508,7 @@ export function AutomationQuickstart({
                   <SelectMenu
                     ariaLabel="Day"
                     value={day}
-                    options={Object.entries(DAYS).map(([k, v]) => ({ value: k, label: v.label }))}
+                    options={Object.entries(DAYS).map(([k, v]) => ({ value: k, label: t.automations[v.labelKey as keyof typeof t.automations] as string }))}
                     onChange={setDay}
                   />
                 </div>

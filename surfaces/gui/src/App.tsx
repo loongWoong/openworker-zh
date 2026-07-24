@@ -32,6 +32,7 @@ import { isProjectScoped } from "./personaScope";
 import { baseName } from "./paths";
 import { itemsFromMessages } from "./itemsFromMessages";
 import { streamMode } from "./streamGate";
+import { useT } from "./i18n";
 import { InboxItemCard } from "./components/InboxItemCard";
 import { isTauri, platformOS, startWindowDrag } from "./tauri";
 import { Icon } from "./components/Icon";
@@ -58,10 +59,11 @@ import { PlanCard } from "./components/PlanCard";
 const newId = () =>
   (crypto as any).randomUUID ? crypto.randomUUID().slice(0, 12) : Math.random().toString(36).slice(2, 14);
 
-const SUGGESTIONS = [
-  { ico: "⚙", text: "Run the test suite and summarize any failures." },
-  { ico: "✦", text: "Read the project and give me a 5-bullet overview." },
-  { ico: "↻", text: "Find and fix the failing build." },
+// SUGGESTIONS are keyed by i18n key — resolved per render.
+const SUGGESTION_KEYS = [
+  { ico: "⚙", key: "app.runTests" as const },
+  { ico: "✦", key: "app.projectOverview" as const },
+  { ico: "↻", key: "app.findAndFix" as const },
 ];
 
 // Tools whose success means a new/changed file should show up under Artifacts right away.
@@ -142,6 +144,7 @@ function fallbackWorkspace(current: string | null, projects: RecentWorkspace[]):
 }
 
 export function App() {
+  const t = useT();
   const [workspace, setWorkspace] = useState<string | null>(null);
   const [branch, setBranch] = useState<string | null>(null);
   const [showGate, setShowGate] = useState(false);
@@ -676,23 +679,23 @@ export function App() {
           break;
         case "turn_end":
           if (d.status === "max_iterations_exceeded")
-            setItems((p) => [...p, { kind: "notice", tone: "warn", text: "Stopped: max iterations reached." }]);
+            setItems((p) => [...p, { kind: "notice", tone: "warn", text: t.transcript.maxIterations }]);
           break;
         case "model_changed":
           // Mid-session switch (server-applied): update the header fact and drop the
           // persisted marker into the live transcript (replay renders it from history).
           if (d.model) setModel(d.model);
-          setItems((p) => [...p, { kind: "notice", tone: "info", text: d.text || "Model switched" }]);
+          setItems((p) => [...p, { kind: "notice", tone: "info", text: d.text || t.transcript.modelSwitched }]);
           break;
         case "interrupted":
           flushPartialStream();
-          setItems((p) => [...p, { kind: "notice", tone: "warn", text: "Interrupted." }]);
+          setItems((p) => [...p, { kind: "notice", tone: "warn", text: t.transcript.interrupted }]);
           break;
         case "error":
           flushPartialStream();
           setItems((p) => [
             ...p,
-            { kind: "notice", tone: "warn", text: "Error: " + (d.error || "unknown"), retriable: true },
+            { kind: "notice", tone: "warn", text: t.common.error + ": " + (d.error || "unknown"), retriable: true },
           ]);
           break;
         case "turn_done":
@@ -899,7 +902,7 @@ export function App() {
       if (msg.type !== "automation_run_started") return;
       const d = (msg.data ?? {}) as Record<string, string>;
       setRunToast({
-        title: d.task_title || "Automation",
+        title: d.task_title || "Automation", // server-side title; not localized
         sessionId: d.session_id || "",
         workspace: d.workspace || "",
         agent: d.agent || "cowork",
@@ -1094,7 +1097,7 @@ export function App() {
   const subtitleParts = [modelDisplay];
   if (isProjectScoped(personaOf(agent)) && workspace) subtitleParts.push(baseName(workspace));
   const activeInfo = sessions.find((s) => s.session_id === sessionId);
-  const activeTitle = activeInfo?.title || "New session";
+  const activeTitle = activeInfo?.title || t.common.new_ + " " + "session";
 
   const desktop = isTauri();
   // Dev-only: `?overlay=1` simulates the desktop overlay layout in the browser (adds the
@@ -1133,7 +1136,7 @@ export function App() {
           <Icon name="logo" size={38} />
         </div>
         <div className="boot-text">
-          {resumedExisting ? "Restoring your session…" : "Starting OpenWorker…"}
+          {resumedExisting ? t.app.restoringSession : t.app.starting}
           <span className="beta-tag">BETA</span>
         </div>
       </div>
@@ -1166,10 +1169,10 @@ export function App() {
         >
           <div className="flex items-center gap-2 text-[12.5px] font-semibold">
             <span className="w-[7px] h-[7px] rounded-full bg-faint toast-pulse" />
-            Automation started
+            Automation started {/* toast: not localized yet */}
           </div>
           <div className="text-[12.5px] text-muted mt-0.5 ml-[15px] truncate">
-            {runToast.title} · {runToast.time} run
+            {runToast.title} · {runToast.time} run {/* not localized */}
           </div>
           <div className="flex items-center justify-between ml-[15px] mt-1.5">
             <button
@@ -1180,12 +1183,12 @@ export function App() {
                 setRunToast(null);
               }}
             >
-              View run ›
+              View run › {/* not localized */}
             </button>
             <button
               className="text-[12px] text-faint px-0.5"
               data-testid="toast-dismiss"
-              title="Dismiss"
+              title={t.common.dismiss}
               onClick={() => setRunToast(null)}
             >
               ✕
@@ -1212,8 +1215,8 @@ export function App() {
           className="nav-reveal-btn"
           onClick={toggleNav}
           onMouseEnter={() => setNavPeek(true)}
-          title="Show sidebar (⌘B)"
-          aria-label="Show sidebar"
+          title={t.app.showSidebarAria + " (⌘B)"}
+          aria-label={t.app.showSidebarAria}
         >
           <Icon name="sidebar" size={16} />
         </button>
@@ -1317,24 +1320,24 @@ export function App() {
                 <button
                   className="topbar-icon-btn"
                   onClick={toggleNav}
-                  aria-label="Show sidebar"
-                  title="Show sidebar (⌘B)"
+                  aria-label={t.app.showSidebarAria}
+                  title={t.app.showSidebarAria + " (⌘B)"}
                 >
                   <Icon name="sidebar" size={16} />
                 </button>
                 <button
                   className="topbar-icon-btn"
                   onClick={() => startNewSession()}
-                  aria-label="New session"
-                  title="New session"
+                  aria-label={t.app.newSessionAria}
+                  title={t.app.newSessionAria}
                 >
                   <Icon name="plus" size={16} />
                 </button>
                 <button
                   className="topbar-icon-btn"
                   onClick={() => setSearchOpen(true)}
-                  aria-label="Search"
-                  title="Search"
+                  aria-label={t.app.searchAria}
+                  title={t.app.searchAria}
                 >
                   <Icon name="search" size={16} />
                 </button>
@@ -1370,10 +1373,10 @@ export function App() {
                 className="topbar-artifacts-btn"
                 onMouseDown={(e) => e.stopPropagation()}
                 onClick={() => setRailHidden(false)}
-                title="Show files this conversation produced"
+                title={t.session.showFiles}
               >
                 <Icon name="file" size={14} />
-                <span>Artifacts</span>
+                <span>{t.session.artifacts}</span>
                 <span className="topbar-artifacts-count">{artifactCount}</span>
               </button>
             )}
@@ -1384,8 +1387,8 @@ export function App() {
                 className="topbar-icon-btn"
                 onMouseDown={(e) => e.stopPropagation()}
                 onClick={() => setRailHidden((h) => !h)}
-                aria-label={railHidden ? "Show side panel" : "Hide side panel"}
-                title={railHidden ? "Show side panel" : "Hide side panel"}
+                aria-label={railHidden ? t.session.showSidePanel : t.session.hideSidePanel}
+                title={railHidden ? t.session.showSidePanel : t.session.hideSidePanel}
               >
                 <Icon name="sidebarRight" size={16} />
               </button>
@@ -1405,7 +1408,7 @@ export function App() {
               >
                 <Icon name="clock" size={14} className="text-accent shrink-0" />
                 <span className="truncate text-muted">
-                  Scheduled run
+                  Scheduled run{/* not localized */}
                   {runContext?.title ? (
                     <>
                       {" — "}
@@ -1421,7 +1424,7 @@ export function App() {
                     setSurface("scheduled");
                   }}
                 >
-                  ← Back to runs
+                  ← {t.automations.backToRuns}
                 </button>
               </div>
             )}
@@ -1437,17 +1440,20 @@ export function App() {
                   <div className="hero">
                     <h1 className="greeting">
                       <span className="mark">✦</span>
-                      {agent === "chat" ? "How can I help?" : "Let's build something."}
+                      {agent === "chat" ? t.app.howCanIHelp : t.app.letsBuild}
                     </h1>
                     {needsWorkspace(agent) && (
                       <div className="suggestions">
                         <div className="suggest-head">Try a task</div>
-                        {SUGGESTIONS.map((s, i) => (
-                          <div className="suggest" key={i} onClick={() => workspace && send(s.text)}>
-                            <span className="ico">{s.ico}</span>
-                            {s.text}
-                          </div>
-                        ))}
+                        {SUGGESTION_KEYS.map((s, i) => {
+                          const txt = t.app[s.key];
+                          return (
+                            <div className="suggest" key={i} onClick={() => workspace && send(txt)}>
+                              <span className="ico">{s.ico}</span>
+                              {txt}
+                            </div>
+                          );
+                        })}
                       </div>
                     )}
                   </div>
@@ -1526,10 +1532,10 @@ export function App() {
               resetKey={sessionId}
               placeholder={
                 agent === "code"
-                  ? "Ask the coder to build, fix, or explain…  (drop or paste files)"
+                  ? t.composer.codePlaceholder
                   : agent === "chat"
-                    ? "Ask anything…  (drop or paste files)"
-                    : "Ask the coworker…  (drop or paste files)"
+                    ? t.composer.chatPlaceholder
+                    : t.composer.placeholder
               }
               approvalSlot={
                 // Live inline cards are for ATTENDED sessions only; when Unattended the prompt is
@@ -1635,7 +1641,7 @@ function WaitingForAgent() {
     <div className="waiting-transcript">
       <div className="waiting-row" aria-live="polite">
         <span className="waiting-spinner" />
-        <span>Waiting for agent...</span>
+        <span>Waiting for agent...</span>{/* not localized */}
       </div>
     </div>
   );

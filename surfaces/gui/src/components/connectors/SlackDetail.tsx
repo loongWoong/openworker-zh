@@ -20,6 +20,7 @@ import type { DetailProps } from "./ConnectorsSection";
 import { SlackHowItWorks } from "./SlackHowItWorks";
 import { ToolsDisclosure } from "./ToolsDisclosure";
 import { FOOT, GRP, GRP_H, PILL_ACCENT, PILL_LINE, ROW, TAG_WARN, XBTN } from "./ui";
+import { useT } from "../../i18n";
 
 // The Slack detail page (UX-DECISIONS §21): one group per connected workspace —
 // People (allow-list) · Waiting (parked senders) · Listening (session ↔ channel) ·
@@ -51,6 +52,7 @@ function relayHealth(slack: SlackStatus | null): { dot: string; text: string } {
 }
 
 export function SlackDetail({ c, cloud, slack, onChanged }: DetailProps) {
+  const t = useT();
   const [adding, setAdding] = useState(false);
   const [subs, setSubs] = useState<Subscription[]>([]);
   const loadSubs = () => getSubscriptions().then(setSubs).catch(() => setSubs([]));
@@ -156,7 +158,7 @@ export function SlackDetail({ c, cloud, slack, onChanged }: DetailProps) {
         <AddConnectionModal
           c={c}
           cloud={cloud}
-          title="Add a workspace"
+          title={t.connectors.slackAddWorkspace}
           onClose={() => setAdding(false)}
           onChanged={changed}
         />
@@ -251,7 +253,7 @@ function DisconnectBtn({ teamId, busy, onClick }: { teamId: string; busy: boolea
       onClick={onClick}
       disabled={busy}
     >
-      {busy ? "Disconnecting…" : "Disconnect workspace"}
+      {busy ? t.common.close + "…" : t.connectors.slackDisconnect + " workspace"}
     </button>
   );
 }

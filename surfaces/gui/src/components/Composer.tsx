@@ -5,6 +5,7 @@ import { getSettings, inspectPdf } from "../api";
 import { Dropdown, type Option } from "./Dropdown";
 import { Icon } from "./Icon";
 import { Toggle } from "./Toggle";
+import { useT } from "../i18n";
 import {
   cancelDictation,
   getDictationLevel,
@@ -19,10 +20,10 @@ import {
 // polished enough to ship, and Custom (config.toml auto-allow rules) is a power-user mode
 // with no in-app explanation. The server still honors both — a session already in one of
 // those modes keeps working; the picker just doesn't offer them.
-const PERMISSION_OPTIONS: Option[] = [
-  { value: "discuss", label: "Discuss", description: "Chat and explore — no edits or commands" },
-  { value: "interactive", label: "Ask for approval", description: "Ask before edits and commands" },
-  { value: "auto", label: "Full access", description: "Run everything without asking" },
+const PERMISSION_OPTION_KEYS = [
+  { value: "discuss", labelKey: "composer.discuss" as const, descKey: "composer.discussDesc" as const },
+  { value: "interactive", labelKey: "composer.askForApproval" as const, descKey: "composer.askForApprovalDesc" as const },
+  { value: "auto", labelKey: "composer.fullAccess" as const, descKey: "composer.fullAccessDesc" as const },
 ];
 
 // No hardcoded model fallback: until the server supplies the list (a few seconds after a
@@ -80,6 +81,12 @@ interface Props {
 }
 
 export function Composer(props: Props) {
+  const t = useT();
+  const PERMISSION_OPTIONS: Option[] = PERMISSION_OPTION_KEYS.map((k) => ({
+    value: k.value,
+    label: t[k.labelKey],
+    description: t[k.descKey],
+  }));
   const [text, setText] = useState("");
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [dragging, setDragging] = useState(false);
@@ -290,7 +297,7 @@ export function Composer(props: Props) {
     setDictationError(null);
     try {
       if (dictation?.recording) {
-        setDictationBusy("Transcribing…");
+        setDictationBusy(t.composer.transcribing);
         const transcript = await stopDictation();
         if (transcript === null) throw new Error("Could not transcribe your recording.");
         if (transcript.trim()) {
@@ -307,12 +314,12 @@ export function Composer(props: Props) {
         props.onConfigureVoiceInput?.();
         return;
       }
-      setDictationBusy("Starting microphone…");
+      setDictationBusy(t.composer.startingMicrophone);
       const recording = await startDictation();
       if (!recording?.recording) throw new Error("Could not start the microphone.");
       setDictation(recording);
     } catch (error) {
-      setDictationError(error instanceof Error ? error.message : "Voice dictation is unavailable.");
+      setDictationError(error instanceof Error ? error.message : t.composer.voiceUnavailable);
       const status = await getDictationStatus();
       if (status) setDictation(status);
     } finally {
@@ -390,7 +397,7 @@ export function Composer(props: Props) {
         <textarea
           ref={textareaRef}
           className="w-full block px-3.5 pt-3.5 pb-1.5 text-[14.5px]"
-          placeholder={props.placeholder || "Ask the coworker…  (drop or paste files)"}
+          placeholder={props.placeholder || t.composer.placeholder}
           value={text}
           onChange={(e) => setText(e.target.value)}
           onKeyDown={onKey}
@@ -404,8 +411,8 @@ export function Composer(props: Props) {
           <div className="relative">
             <button
               className={iconBtn + (attachMenuOpen ? " bg-paper text-ink" : "")}
-              title="Attach"
-              aria-label="Attach"
+              title={t.common.attach}
+              aria-label={t.common.attach}
               onClick={() => setAttachMenuOpen((v) => !v)}
             >
               <Icon name="plus" size={17} />
@@ -414,11 +421,11 @@ export function Composer(props: Props) {
               <>
                 <div className="fixed inset-0 z-30" onClick={() => setAttachMenuOpen(false)} />
                 <div className="absolute z-40 bottom-full mb-1 left-0 min-w-[180px] rounded-xl border border-line bg-panel shadow-2xl py-1.5">
-                  {attachItem("image", "Photo or image", () => pickFiles("image/*"))}
+                  {attachItem("image", t.composer.photoOrImage, () => pickFiles("image/*"))}
                   {attachItem("file", "PDF", () => pickFiles("application/pdf,.pdf"))}
                   {attachItem(
                     "fileCode",
-                    "Other files",
+                    t.composer.otherFiles,
                     () => pickFiles("text/*,.md,.csv,.json,.yaml,.yml,.log,.py,.ts,.tsx,.js,.rs,.go,.toml"),
                   )}
                 </div>
@@ -470,9 +477,9 @@ export function Composer(props: Props) {
               className="pill model-warn chip"
               onClick={() => props.onConnectModel?.()}
               title="Connect a model"
-              aria-label="No model connected — connect a model"
+              aria-label={t.composer.noModelConnected + " — " + t.composer.connectAModel}
             >
-              <span className="pill-label">No model</span>
+              <span className="pill-label">{t.composer.noModelConnected}</span>
               <span className="model-warn-ico" aria-hidden>⚠</span>
             </button>
           ) : modelsLoaded ? (
@@ -484,7 +491,7 @@ export function Composer(props: Props) {
               data-testid="models-loading"
               title="Fetching the model list from the server"
             >
-              <span className="pill-label">Loading models…</span>
+              <span className="pill-label">{t.composer.loadingModels}</span>
             </button>
           ))}
 
@@ -502,7 +509,7 @@ export function Composer(props: Props) {
               title={
                 dictationBusy ||
                 (dictation?.recording
-                  ? "Stop recording and transcribe"
+                  ? t.composer.stopRecording
                   : voiceReady
                     ? "Start local voice dictation"
                     : "Configure Voice Input in Settings")
@@ -529,7 +536,7 @@ export function Composer(props: Props) {
               }
               onClick={submit}
               disabled={!props.connected || !!dictation?.recording || !!dictationBusy}
-              title={needsModel ? "Connect a model to send" : undefined}
+              title={needsModel ? t.composer.connectAModel + " " + t.common.send : undefined}
               aria-label="Send"
             >
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">

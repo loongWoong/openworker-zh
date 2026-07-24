@@ -8,6 +8,7 @@ import {
 } from "../api";
 import { openExternal } from "../tauri";
 import { PROVIDER_LOGOS, providerRank } from "./logos";
+import { useT } from "../i18n";
 
 // The provider gallery ⇄ key form, shared by Onboarding step 1 (§39) and
 // Settings ▸ Models (UX-021) so the two can never drift apart visually. The hook
@@ -50,9 +51,20 @@ export function ProviderMark({ name, title, size = 32 }: { name: string; title: 
   );
 }
 
-/** "2h ago"-style label for a provider's last completion (null when never used). */
+function relTimeInner(epoch: number, t: ReturnType<typeof import("../i18n").useT>): string {
+  if (!epoch) return "";
+  const secs = Math.max(0, Math.floor(Date.now() / 1000 - epoch));
+  if (secs < 90) return t.justNow;
+  const mins = Math.floor(secs / 60);
+  if (mins < 60) return t.minutesAgo(mins);
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 48) return t.hoursAgo(hrs);
+  return `${Math.floor(hrs / 24)}d ago`;
+}
+
 export function relTime(epoch?: number | null): string | null {
   if (!epoch) return null;
+  // Fallback relative time (used without i18n context)
   const secs = Math.max(0, Math.floor(Date.now() / 1000 - epoch));
   if (secs < 90) return "just now";
   const mins = Math.floor(secs / 60);

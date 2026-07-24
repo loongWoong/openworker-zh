@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { Item } from "../types";
 import { chooseFolder } from "../tauri";
 import { Icon } from "./Icon";
+import { useT } from "../i18n";
 
 type DirReqItem = Extract<Item, { kind: "dirreq" }>;
 
@@ -14,6 +15,7 @@ export function DirectoryRequestCard({
   item: DirReqItem;
   onRespond: (granted: boolean, path?: string, writable?: boolean) => void;
 }) {
+  const t = useT();
   const [path, setPath] = useState(item.path || "");
   const [writable, setWritable] = useState(!!item.writable);
 
@@ -32,7 +34,7 @@ export function DirectoryRequestCard({
       <div className="dirreq-pathrow">
         <input
           className="dirreq-path"
-          placeholder="Choose or paste a folder path…"
+          placeholder={t.session.pathPlaceholder}
           value={path}
           onChange={(e) => setPath(e.target.value)}
         />

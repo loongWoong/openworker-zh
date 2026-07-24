@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { Item } from "../types";
 import { Icon } from "./Icon";
 import { Markdown } from "./Markdown";
+import { useT } from "../i18n";
 
 type PlanItem = Extract<Item, { kind: "planreq" }>;
 
@@ -15,6 +16,7 @@ export function PlanCard({
   item: PlanItem;
   onRespond: (approved: boolean, mode?: string, feedback?: string) => void;
 }) {
+  const t = useT();
   const [rejecting, setRejecting] = useState(false);
   const [feedback, setFeedback] = useState("");
 
@@ -22,7 +24,7 @@ export function PlanCard({
     <div className="dirreq-card plan-card">
       <div className="dirreq-head">
         <Icon name="sparkle" size={16} className="ico" />
-        <span>The agent proposed a plan</span>
+        <span>Plan proposal</span>
       </div>
       <div className="plan-body">
         <Markdown text={item.plan} />
@@ -40,7 +42,7 @@ export function PlanCard({
             }}
           />
           <button className="btn" onClick={() => setRejecting(false)}>
-            Back
+            {t.common.back}
           </button>
           <button
             className="btn primary"

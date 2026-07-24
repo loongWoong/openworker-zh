@@ -31,6 +31,8 @@ import {
 } from "../tauri";
 import { useThemePref } from "../theme";
 import { Icon } from "./Icon";
+import { useT } from "../i18n";
+import type { Translations } from "../i18n";
 import { PanelHead } from "./IntegrationsView";
 import { ModelsTab } from "./ManageTabs";
 import { GalleryModal } from "./GalleryModal";
@@ -55,12 +57,22 @@ const BTN_ACCENT = "text-[12.5px] px-3 py-2 rounded-lg bg-accent text-white shri
 const BTN_BORDERED =
   "text-[12.5px] px-3 py-2 rounded-lg border border-line bg-paper hover:border-lineStrong shrink-0";
 
-const SET_TABS: { key: SetTab; label: string; icon: "sliders" | "code" | "mic" | "sparkle" }[] = [
-  { key: "appearance", label: "General", icon: "sliders" },
-  { key: "models", label: "Models", icon: "code" },
-  { key: "voice", label: "Voice input", icon: "mic" },
-  { key: "personas", label: "Personas", icon: "sparkle" },
+const SET_TABS: { key: SetTab; labelKey: string; icon: "sliders" | "code" | "mic" | "sparkle" }[] = [
+  { key: "appearance", labelKey: "settings.general", icon: "sliders" },
+  { key: "models", labelKey: "settings.models", icon: "code" },
+  { key: "voice", labelKey: "settings.voiceInput", icon: "mic" },
+  { key: "personas", labelKey: "settings.personas", icon: "sparkle" },
 ];
+
+function resolveSettingLabel(key: SetTab, t: Translations): string {
+  const map: Record<SetTab, string> = {
+    appearance: t.settings.general,
+    models: t.settings.models,
+    voice: t.settings.voiceInput,
+    personas: t.settings.personas,
+  };
+  return map[key];
+}
 
 export function SettingsView({
   initialTab,
@@ -69,6 +81,7 @@ export function SettingsView({
   initialTab?: SetTab;
   onOpenPersona?: (id: string) => void;
 }) {
+  const t = useT();
   // Personas is flag-gated (hidden for launch) — filter the tab AND coerce a stale
   // deep-link to it (openSettings("personas") callers) so the page never opens on a
   // section with no nav entry.
@@ -81,7 +94,7 @@ export function SettingsView({
     <main className="flex-1 min-w-0 flex bg-paper">
       <nav className="page-subnav w-[208px] shrink-0 border-r border-line bg-panel/40 px-3 py-4">
         <div className="px-2 text-[13.5px] font-semibold mb-3 flex items-center gap-2">
-          <Icon name="gear" size={16} /> Settings
+          <Icon name="gear" size={16} /> {t.common.settings}
         </div>
         {tabs.map((t) => {
           const active = tab === t.key;
@@ -94,7 +107,7 @@ export function SettingsView({
               }
               onClick={() => setTab(t.key)}
             >
-              <Icon name={t.icon} size={15} /> {t.label}
+              <Icon name={t.icon} size={15} /> {resolveSettingLabel(tab.key, t)}
             </button>
           );
         })}

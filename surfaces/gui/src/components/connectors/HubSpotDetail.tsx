@@ -10,6 +10,7 @@ import { AddConnectionModal } from "./AddConnectionModal";
 import type { DetailProps } from "./ConnectorsSection";
 import { ToolsDisclosure } from "./ToolsDisclosure";
 import { FOOT, GRP, GRP_H, PILL_ACCENT, ROW, TAG_ACCENT, TAG_QUIET, TAG_WARN, XBTN } from "./ui";
+import { useT } from "../../i18n";
 
 // The HubSpot detail page (UX-DECISIONS §21): connected portals (multi-portal,
 // Default/Sandbox tags, the consent tier granted at connect) + Access & privacy
@@ -20,6 +21,7 @@ import { FOOT, GRP, GRP_H, PILL_ACCENT, ROW, TAG_ACCENT, TAG_QUIET, TAG_WARN, XB
 const LABEL = "text-[12.5px] text-muted w-24 shrink-0";
 
 export function HubSpotDetail({ c, cloud, slack: _slack, onChanged }: DetailProps) {
+  const t = useT();
   const [adding, setAdding] = useState(false);
   const portals = c.portals ?? [];
 
@@ -79,7 +81,7 @@ export function HubSpotDetail({ c, cloud, slack: _slack, onChanged }: DetailProp
         <AddConnectionModal
           c={c}
           cloud={cloud}
-          title="Add a portal"
+          title={t.connectors.hubspotAddPortal}
           onClose={() => setAdding(false)}
           onChanged={onChanged}
         />
