@@ -462,6 +462,7 @@ export function Composer(props: Props) {
               onModeChange={props.onModeChange}
               unattended={props.unattended}
               onUnattendedChange={props.onUnattendedChange}
+              options={PERMISSION_OPTIONS}
             />
           ) : null}
 
@@ -561,14 +562,16 @@ function ModeMenu({
   onModeChange,
   unattended,
   onUnattendedChange,
+  options,
 }: {
   mode: string;
   onModeChange: (mode: string) => void;
   unattended?: boolean;
   onUnattendedChange?: (on: boolean) => void;
+  options: { value: string; label: string; description: string }[];
 }) {
   const [open, setOpen] = useState(false);
-  const current = PERMISSION_OPTIONS.find((o) => o.value === mode);
+  const current = options.find((o) => o.value === mode);
   return (
     <div className="relative">
       {/* Borderless, and it names the CHOSEN mode (owner ask 2026-07-11, competitor composer
@@ -596,7 +599,7 @@ function ModeMenu({
             role="menu"
             data-testid="mode-menu"
           >
-            {PERMISSION_OPTIONS.map((o) => (
+            {options.map((o) => (
               <button
                 key={o.value}
                 className="w-full flex flex-col items-start px-2.5 py-1.5 rounded-lg text-left hover:bg-paper"

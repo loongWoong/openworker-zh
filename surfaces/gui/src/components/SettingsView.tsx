@@ -86,7 +86,7 @@ export function SettingsView({
   // deep-link to it (openSettings("personas") callers) so the page never opens on a
   // section with no nav entry.
   const personas = showPersonas();
-  const tabs = personas ? SET_TABS : SET_TABS.filter((t) => t.key !== "personas");
+  const tabs = personas ? SET_TABS : SET_TABS.filter((x) => x.key !== "personas");
   const wanted = initialTab && (personas || initialTab !== "personas") ? initialTab : "appearance";
   const [tab, setTab] = useState<SetTab>(wanted);
 
@@ -96,18 +96,18 @@ export function SettingsView({
         <div className="px-2 text-[13.5px] font-semibold mb-3 flex items-center gap-2">
           <Icon name="gear" size={16} /> {t.common.settings}
         </div>
-        {tabs.map((t) => {
-          const active = tab === t.key;
+        {tabs.map((item) => {
+          const active = tab === item.key;
           return (
             <button
-              key={t.key}
+              key={item.key}
               className={
                 "w-full text-left px-2.5 py-2 rounded-lg text-[13px] flex items-center gap-2 " +
                 (active ? "bg-paper text-accent font-medium" : "text-muted hover:bg-paper hover:text-ink")
               }
-              onClick={() => setTab(t.key)}
+              onClick={() => setTab(item.key)}
             >
-              <Icon name={t.icon} size={15} /> {resolveSettingLabel(tab.key, t)}
+              <Icon name={item.icon} size={15} /> {resolveSettingLabel(item.key, t)}
             </button>
           );
         })}

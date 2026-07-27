@@ -56,6 +56,7 @@ function BubbleMeta({ text, ts, align }: { text: string; ts?: number; align: "le
 // collapsed by default, the trace one click away. `live` = still streaming (pulsing label);
 // App renders that variant above the transcript, this one rides a finalized assistant item.
 export function ThinkingBlock({ text, live }: { text: string; live?: boolean }) {
+  const t = useT();
   const [open, setOpen] = useState(false);
   return (
     <div className="thinking">

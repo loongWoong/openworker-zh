@@ -207,6 +207,7 @@ function NewAutomationForm({
   onCancel: () => void;
   onCreate: (p: { title: string; instructions: string; cron?: string }) => void;
 }) {
+  const t = useT();
   const [title, setTitle] = useState("");
   const [instructions, setInstructions] = useState("");
   const [time, setTime] = useState("09:00");
@@ -290,6 +291,7 @@ function TaskDetail({
   ) => void;
   onRunNow: (taskId: string, title?: string) => void;
 }) {
+  const t = useT();
   const [task, setTask] = useState<Automation | null>(null);
   const [runs, setRuns] = useState<AutomationRun[]>([]);
   const [editing, setEditing] = useState(false);

@@ -46,7 +46,7 @@ const surfaceFromPersona = (p: Persona) => ({
 
 // Attention = Inbox items awaiting a session (an accent count that bubbles session → persona →
 // footer Inbox — all views of the one Inbox queue, never a second list).
-function AttnBadge({ n }: { n: number }) {
+function AttnBadge({ n, t }: { n: number; t: any }) {
   if (!n) return null;
   return (
     <span
@@ -75,7 +75,7 @@ function UnseenBadge({ n, failed }: { n: number; failed?: boolean }) {
 
 // Liveness = working (in-flight turn) / sleeping (a self-wake is pending). A count-less dot that
 // never bubbles — it says "this is alive", not "this needs you".
-function LiveDot({ state }: { state?: "working" | "sleeping" | "idle" }) {
+function LiveDot({ state, t }: { state?: "working" | "sleeping" | "idle"; t: any }) {
   if (state !== "working" && state !== "sleeping") return null;
   return state === "working" ? (
     <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse shrink-0" title={t.sidebar.workingNow} />
@@ -89,7 +89,7 @@ function LiveDot({ state }: { state?: "working" | "sleeping" | "idle" }) {
 
 // §31: a session spawned by a platform mention wears its platform's logo, right-aligned beside
 // the title cluster (owner call 2026-07-13). Slack today; the origin key is the platform id.
-function OriginIcon({ s }: { s: SessionInfo }) {
+function OriginIcon({ s, t }: { s: SessionInfo; t: any }) {
   if (s.origin !== "slack") return null;
   return (
     <ConnectorIcon
@@ -579,9 +579,9 @@ export function Sidebar(props: Props) {
               {opts.showTime && compactAge(s.updated_at) && (
                 <span className="text-[11px] text-faint tabular-nums">{compactAge(s.updated_at)}</span>
               )}
-              <OriginIcon s={s} />
-              <LiveDot state={s.liveness} />
-              <AttnBadge n={s.attention || 0} />
+              <OriginIcon s={s} t={t} />
+              <LiveDot state={s.liveness} t={t} />
+              <AttnBadge n={s.attention || 0} t={t} />
             </span>
             {rowActions(s, title)}
           </>
@@ -644,10 +644,10 @@ export function Sidebar(props: Props) {
                 (rowMenu?.id === s.session_id ? " hidden" : "")
               }
             >
-              <OriginIcon s={s} />
+              <OriginIcon s={s} t={t} />
               <ConnectorDot subs={s.subscriptions} />
-              <LiveDot state={s.liveness} />
-              <AttnBadge n={s.attention || 0} />
+              <LiveDot state={s.liveness} t={t} />
+              <AttnBadge n={s.attention || 0} t={t} />
             </span>
             {rowActions(s, title)}
           </>
@@ -1080,8 +1080,8 @@ export function Sidebar(props: Props) {
                       >
                         {s.label}
                       </span>
-                      <LiveDot state={liveByPersona.get(s.key)} />
-                      <AttnBadge n={attnByPersona.get(s.key) || 0} />
+                      <LiveDot state={liveByPersona.get(s.key)} t={t} />
+                      <AttnBadge n={attnByPersona.get(s.key) || 0} t={t} />
                       {/* Persona configuration moved to Settings ▸ Personas (Rohit's call
                           2026-07-07) — the per-group gear read as clutter here. */}
                       <Icon
@@ -1176,7 +1176,7 @@ export function Sidebar(props: Props) {
                   "Inbox",
                   props.onOpenInbox,
                   props.inboxActive,
-                  <AttnBadge n={totalAttention} />,
+                  <AttnBadge n={totalAttention} t={t} />,
                 )}
                 {appMenuItem("plug", "Connectors", props.onOpenIntegrations, props.integrationsActive)}
                 <div className="h-px bg-line my-1 mx-2" />
