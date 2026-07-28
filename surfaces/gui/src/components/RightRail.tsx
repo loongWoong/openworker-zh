@@ -300,6 +300,7 @@ function ArtifactViewer({
   onReload: () => Promise<void>;
   onBack: () => void;
 }) {
+  const t = useT();
   const [reloadKey, setReloadKey] = useState(0);
   const isHtml = content?.kind === "html" && !content.error;
   // Best viewed in a real app: spreadsheets, PDFs, and Office docs (pptx/docx can't preview inline)
